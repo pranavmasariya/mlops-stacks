@@ -1,0 +1,57 @@
+stages:
+    - tests
+    - integration
+    - release
+
+default:
+  image: ubuntu:20.04
+  before_script:
+    - apt-get -y update
+    - apt-get -y install curl
+    - apt-get -y install unzip
+    - apt -y install python3
+    - apt-get -y install python3-setuptools
+    - apt -y install python3-pip
+    - pip3 install wheel
+    - curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+    - databricks -v
+
+unit-test:
+  stage: tests
+  tags:
+    - shc
+  script:
+    - pip install -r test-requirements.txt
+    - pip install -r {{template `project_name_alphanumeric_underscore` .}}/requirements.txt
+    - pytest --junitxml=test-unit.xml
+
+integration-test:
+  stage: tests
+  tags:
+    - shc
+  needs:
+    - job: unit-test
+      optional: false
+  rules:
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == '{{template `default_branch` .}}'
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+  script:
+    - export DATABRICKS_TOKEN=$DATABRICKS_TOKEN_STG
+    - echo "Deploying to stage"
+    - databricks bundle deploy -t staging
+    - echo "Run job"
+    - databricks bundle run model_training_job -t staging
+    
+deploy-prod:
+  stage: release
+  tags:
+    - shc
+  only:
+    refs:
+      - {{template `release_branch` .}}
+  script:
+    - export DATABRICKS_TOKEN=$DATABRICKS_TOKEN_PROD
+    - echo "Validate bundle"
+    - databricks bundle validate -t prod
+    - echo "Deploying to prod"
+    - databricks bundle deploy -t prod

@@ -1,5 +1,5 @@
 {
-  "welcome_message": "Welcome to MLOps Stacks. For detailed information on project generation, see the README at https://github.com/databricks/mlops-stacks/blob/main/README.md.",
+  "welcome_message": "Welcome to MLITT - Machine Learning In The Trench.",
   "min_databricks_cli_version": "v0.209.1",
   "properties": {
     "input_project_name": {
@@ -22,14 +22,14 @@
       "type": "string",
       "description": "\nSelect cloud",
       "default": "azure",
-      "enum": ["azure", "aws"]
+      "enum": ["azure"]
     },
     "input_cicd_platform": {
       "order": 4,
       "type": "string",
       "description": "\nSelect CICD platform",
-      "default": "github_actions",
-      "enum": ["github_actions", "github_actions_for_github_enterprise_servers", "azure_devops"]
+      "default": "gitlab",
+      "enum": ["gitlab"]
     },
     "input_databricks_staging_workspace_host": {
       "order": 5,

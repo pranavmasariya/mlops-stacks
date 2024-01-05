@@ -24,6 +24,8 @@
         gitHubEnterprise
     {{- else if (eq .input_cicd_platform `azure_devops`) -}}
         azureDevOpsServices
+    {{- else if (eq .input_cicd_platform `gitlab`) -}}
+        gitLab
     {{- else -}}
         {{ fail `Invalid selection of cicd_platform. Please choose from [github_actions, github_actions_for_github_enterprise_servers, azure_devops]` }}
     {{- end -}}
